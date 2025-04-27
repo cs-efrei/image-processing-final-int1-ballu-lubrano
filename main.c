@@ -30,14 +30,13 @@ int main()
                 }
                 printf("Enter filename: ");
                 scanf("%99s", filename);
-                image = bmp8_loadImage(filename);  // Use the input filename, not hardcoded path
+                image = bmp8_loadImage(filename);  
                 if (image) {
                     printf("Image loaded successfully!\n");
                 } else {
                     printf("Failed to load image. Check if file exists.\n");
                 }
                 break;
-
             case 2:
                 if (!image) {
                     printf("No image loaded!\n");
@@ -48,8 +47,6 @@ int main()
                 bmp8_saveImage(filename, image);
                 printf("Image saved successfully!\n");
                 break;
-
-                /* Rest of your switch cases remain the same */
             case 3:
                 if (!image) {
                     printf("No image loaded!\n");
@@ -58,9 +55,6 @@ int main()
                 bmp8_negative(image);
                 printf("Negative created!\n");
                 break;
-
-                /* ... other cases ... */
-
             case 8:
                 if (image) bmp8_free(image);
                 printf("Goodbye!\n");
