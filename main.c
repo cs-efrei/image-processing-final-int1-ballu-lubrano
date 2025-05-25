@@ -10,7 +10,7 @@ void menu8bit() {
     int choice, value;
 
     do {
-        printf("\n=== 8-bit Grayscale Menu ===\n");
+        printf("\n8-bit Grayscale Menu \n");
         printf("1. Load Image\n");
         printf("2. Negative Filter\n");
         printf("3. Brightness Adjustment\n");
@@ -19,12 +19,15 @@ void menu8bit() {
         printf("6. Image Info\n");
         printf("7. Back to Main Menu\n");
         printf("Choice: ");
-        scanf("%d", &choice);
+        if (scanf("%d", &choice) != 1) {
+            while (getchar() != '\n');
+            choice = 0;
+        }
 
         switch (choice) {
             case 1:
                 printf("Enter BMP filename: ");
-                scanf("%s", filename);
+                scanf("%255s", filename);
                 img = bmp8_loadImage(filename);
                 break;
             case 2:
@@ -48,7 +51,7 @@ void menu8bit() {
             case 5:
                 if (img) {
                     printf("Enter filename to save: ");
-                    scanf("%s", filename);
+                    scanf("%255s", filename);
                     bmp8_saveImage(filename, img);
                 } else printf("Load an image first.\n");
                 break;
@@ -81,12 +84,15 @@ void menu24bit() {
         printf("6. Save Image\n");
         printf("7. Back to Main Menu\n");
         printf("Choice: ");
-        scanf("%d", &choice);
+        if (scanf("%d", &choice) != 1) {
+            while (getchar() != '\n');
+            choice = 0;
+        }
 
         switch (choice) {
             case 1:
                 printf("Enter BMP filename: ");
-                scanf("%s", filename);
+                scanf("%255s", filename);
                 img = bmp24_loadImage(filename);
                 break;
             case 2:
@@ -106,16 +112,14 @@ void menu24bit() {
                 break;
             case 5:
                 if (img) {
-                    float **kernel = getBoxBlurKernel();  // or getSharpenKernel(), etc.
-                    bmp24_applyFilter(img, kernel, 3);
-                    freeKernel(kernel, 3);
+                    bmp24_boxBlur(img);
                     printf("Box blur filter applied.\n");
                 } else printf("Load an image first.\n");
                 break;
             case 6:
                 if (img) {
                     printf("Enter filename to save: ");
-                    scanf("%s", filename);
+                    scanf("%255s", filename);
                     bmp24_saveImage(img, filename);
                 } else printf("Load an image first.\n");
                 break;
@@ -133,12 +137,15 @@ int main() {
     int mode;
 
     do {
-        printf("\n=== BMP Image Processor ===\n");
+        printf("\nBMP Image Processor\n");
         printf("1. 8-bit Grayscale Mode\n");
         printf("2. 24-bit Color Mode\n");
         printf("3. Exit\n");
         printf("Select mode: ");
-        scanf("%d", &mode);
+        if (scanf("%d", &mode) != 1) {
+            while (getchar() != '\n');
+            mode = 0;
+        }
 
         switch (mode) {
             case 1:
