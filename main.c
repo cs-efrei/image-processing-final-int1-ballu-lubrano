@@ -1,67 +1,159 @@
-#include "bmp8.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "bmp8.h"
+#include "bmp24.h"
 
-int main()
-{
-    t_bmp8* image = NULL;
-    char filename[100];
+void menu8bit() {
+    t_bmp8 *img = NULL;
+    char filename[256];
     int choice, value;
 
-    printf("\n-----|Image Processor|-----\n");
-
-    while (1) {
-        printf("\nMain Menu:\n");
-        printf("1. Load image\n");
-        printf("2. Save image\n");
-        printf("3. Create negative\n");
-        printf("4. Adjust brightness\n");
-        printf("5. Apply threshold\n");
-        printf("6. Apply blur\n");
-        printf("7. Show image info\n");
-        printf("8. Exit\n");
-        printf("Your choice: ");
+    do {
+        printf("\n=== 8-bit Grayscale Menu ===\n");
+        printf("1. Load Image\n");
+        printf("2. Negative Filter\n");
+        printf("3. Brightness Adjustment\n");
+        printf("4. Thresholding\n");
+        printf("5. Save Image\n");
+        printf("6. Image Info\n");
+        printf("7. Back to Main Menu\n");
+        printf("Choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                if (image) {
-                    bmp8_free(image);
-                    image = NULL;
-                }
-                printf("Enter filename: ");
-                scanf("%99s", filename);
-                image = bmp8_loadImage(filename);  
-                if (image) {
-                    printf("Image loaded successfully!\n");
-                } else {
-                    printf("Failed to load image. Check if file exists.\n");
-                }
+                printf("Enter BMP filename: ");
+                scanf("%s", filename);
+                img = bmp8_loadImage(filename);
                 break;
             case 2:
-                if (!image) {
-                    printf("No image loaded!\n");
-                    break;
-                }
-                printf("Enter filename to save: ");
-                scanf("%99s", filename);
-                bmp8_saveImage(filename, image);
-                printf("Image saved successfully!\n");
+                if (img) bmp8_negative(img);
+                else printf("Load an image first.\n");
                 break;
             case 3:
-                if (!image) {
-                    printf("No image loaded!\n");
-                    break;
-                }
-                bmp8_negative(image);
-                printf("Negative created!\n");
+                if (img) {
+                    printf("Brightness value (-255 to 255): ");
+                    scanf("%d", &value);
+                    bmp8_brightness(img, value);
+                } else printf("Load an image first.\n");
                 break;
-            case 8:
-                if (image) bmp8_free(image);
-                printf("Goodbye!\n");
-                return 0;
-
+            case 4:
+                if (img) {
+                    printf("Threshold (0-255): ");
+                    scanf("%d", &value);
+                    bmp8_threshold(img, value);
+                } else printf("Load an image first.\n");
+                break;
+            case 5:
+                if (img) {
+                    printf("Enter filename to save: ");
+                    scanf("%s", filename);
+                    bmp8_saveImage(filename, img);
+                } else printf("Load an image first.\n");
+                break;
+            case 6:
+                if (img) bmp8_printInfo(img);
+                else printf("Load an image first.\n");
+                break;
+            case 7:
+                bmp8_free(img);
+                img = NULL;
+                break;
             default:
-                printf("Invalid choice!\n");
+                printf("Invalid choice.\n");
         }
-    }
+    } while (choice != 7);
+}
+
+void menu24bit() {
+    t_bmp24 *img = NULL;
+    char filename[256];
+    int choice, value;
+
+    do {
+        printf("\n=== 24-bit Color Menu ===\n");
+        printf("1. Load Image\n");
+        printf("2. Negative Filter\n");
+        printf("3. Brightness Adjustment\n");
+        printf("4. Grayscale Conversion\n");
+        printf("5. Apply Filter (Box Blur)\n");
+        printf("6. Save Image\n");
+        printf("7. Back to Main Menu\n");
+        printf("Choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter BMP filename: ");
+                scanf("%s", filename);
+                img = bmp24_loadImage(filename);
+                break;
+            case 2:
+                if (img) bmp24_negative(img);
+                else printf("Load an image first.\n");
+                break;
+            case 3:
+                if (img) {
+                    printf("Brightness value (-255 to 255): ");
+                    scanf("%d", &value);
+                    bmp24_brightness(img, value);
+                } else printf("Load an image first.\n");
+                break;
+            case 4:
+                if (img) bmp24_grayscale(img);
+                else printf("Load an image first.\n");
+                break;
+            case 5:
+                if (img) {
+                    float **kernel = getBoxBlurKernel();  // or getSharpenKernel(), etc.
+                    bmp24_applyFilter(img, kernel, 3);
+                    freeKernel(kernel, 3);
+                    printf("Box blur filter applied.\n");
+                } else printf("Load an image first.\n");
+                break;
+            case 6:
+                if (img) {
+                    printf("Enter filename to save: ");
+                    scanf("%s", filename);
+                    bmp24_saveImage(img, filename);
+                } else printf("Load an image first.\n");
+                break;
+            case 7:
+                bmp24_free(img);
+                img = NULL;
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while (choice != 7);
+}
+
+int main() {
+    int mode;
+
+    do {
+        printf("\n=== BMP Image Processor ===\n");
+        printf("1. 8-bit Grayscale Mode\n");
+        printf("2. 24-bit Color Mode\n");
+        printf("3. Exit\n");
+        printf("Select mode: ");
+        scanf("%d", &mode);
+
+        switch (mode) {
+            case 1:
+                menu8bit();
+                break;
+            case 2:
+                menu24bit();
+                break;
+            case 3:
+                printf("Goodbye!\n");
+                break;
+            default:
+                printf("Invalid option.\n");
+        }
+    } while (mode != 3);
+
+    return 0;
 }
